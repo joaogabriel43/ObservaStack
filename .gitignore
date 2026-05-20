@@ -1,0 +1,70 @@
+# ObservaStack — .gitignore
+
+# ===============================
+# Maven
+# ===============================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ===============================
+# IDE — IntelliJ IDEA
+# ===============================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# ===============================
+# IDE — VSCode
+# ===============================
+.vscode/
+*.code-workspace
+
+# ===============================
+# IDE — Eclipse
+# ===============================
+.classpath
+.project
+.settings/
+bin/
+
+# ===============================
+# OS
+# ===============================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ===============================
+# Spring Boot
+# ===============================
+application-local.yml
+application-local.properties
+
+# ===============================
+# Testcontainers
+# ===============================
+.testcontainers.properties
+
+# ===============================
+# Security (nunca commitar)
+# ===============================
+*.env
+.env
+*.pem
+*.key
+*.jks
+*.p12
+secrets/
+
+# ===============================
+# Build/CI artifacts
+# ===============================
+dependency-check-report.*
+spotbugsXml.xml
+trivy-results.sarif
+gitleaks-report.json
