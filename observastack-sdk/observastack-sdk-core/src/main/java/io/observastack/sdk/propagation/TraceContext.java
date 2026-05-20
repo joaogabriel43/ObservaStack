@@ -44,6 +44,20 @@ public final class TraceContext {
     // -------------------------------------------------------------------------
 
     /**
+     * Inicia um novo contexto de trace com IDs específicos.
+     *
+     * @param traceId ID do trace (existente ou novo)
+     * @param spanId ID do span (novo span atual)
+     * @param sampled indica se este trace será amostrado
+     * @return novo {@link TraceContext}
+     */
+    public static TraceContext startWithIds(TraceId traceId, SpanId spanId, boolean sampled) {
+        TraceContext ctx = new TraceContext(traceId, spanId, sampled);
+        CONTEXT.set(ctx);
+        return ctx;
+    }
+
+    /**
      * Inicia um novo contexto de trace com IDs gerados aleatoriamente.
      *
      * @param sampled indica se este trace será amostrado/enviado ao servidor

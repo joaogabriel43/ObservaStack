@@ -55,4 +55,55 @@ public class ObservaStackAutoConfiguration {
             .enabled(properties.isEnabled())
             .build();
     }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public io.observastack.sdk.dispatch.DispatchHttpClient dispatchHttpClient(ObservaStackProperties properties) {
+        return new io.observastack.sdk.dispatch.DispatchHttpClient(properties.getServerUrl());
+    }
+
+    @Bean(destroyMethod = "close")
+    @ConditionalOnMissingBean
+    public io.observastack.sdk.dispatch.SpanDispatcher spanDispatcher(
+            ObservaStackProperties properties,
+            io.observastack.sdk.dispatch.DispatchHttpClient dispatchHttpClient) {
+        return new io.observastack.sdk.dispatch.SpanDispatcher(
+                properties.getServiceName(),
+                properties.getBufferMaxSize(),
+                dispatchHttpClient
+        );
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public io.observastack.sdk.web.ObservaStackFilter observaStackFilter(
+            Sampler sampler,
+            io.observastack.sdk.dispatch.SpanDispatcher spanDispatcher,
+            ObservaStackProperties properties) {
+        return new io.observastack.sdk.web.ObservaStackFilter(
+                sampler,
+                spanDispatcher,
+                properties.getSamplingRate()
+        );
+    }
+
+    @Bean
+    public org.springframework.boot.web.servlet.FilterRegistrationBean<io.observastack.sdk.web.ObservaStackFilter> observaStackFilterRegistration(
+            io.observastack.sdk.web.ObservaStackFilter filter) {
+        org.springframework.boot.web.servlet.FilterRegistrationBean<io.observastack.sdk.web.ObservaStackFilter> registration = new org.springframework.boot.web.servlet.FilterRegistrationBean<>(filter);
+        registration.setOrder(org.springframework.core.Ordered.HIGHEST_PRECEDENCE + 1);
+        return registration;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public io.observastack.sdk.autoconfigure.web.ObservaStackClientInterceptor observaStackClientInterceptor() {
+        return new io.observastack.sdk.autoconfigure.web.ObservaStackClientInterceptor();
+    }
+
+    @Bean
+    public org.springframework.boot.web.client.RestTemplateCustomizer observaStackRestTemplateCustomizer(
+            io.observastack.sdk.autoconfigure.web.ObservaStackClientInterceptor interceptor) {
+        return restTemplate -> restTemplate.getInterceptors().add(interceptor);
+    }
 }

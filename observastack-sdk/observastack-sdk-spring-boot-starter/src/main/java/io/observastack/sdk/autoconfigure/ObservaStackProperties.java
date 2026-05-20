@@ -32,6 +32,9 @@ public class ObservaStackProperties {
      */
     private double samplingRate = 1.0;
 
+    /** Tamanho máximo da fila de spans em memória. */
+    private int bufferMaxSize = 1000;
+
     // Getters e Setters
 
     public boolean isEnabled() { return enabled; }
@@ -45,4 +48,7 @@ public class ObservaStackProperties {
 
     public double getSamplingRate() { return samplingRate; }
     public void setSamplingRate(double samplingRate) { this.samplingRate = samplingRate; }
+
+    public int getBufferMaxSize() { return bufferMaxSize; }
+    public void setBufferMaxSize(int bufferMaxSize) { this.bufferMaxSize = bufferMaxSize; }
 }

@@ -40,7 +40,11 @@ public final class Span {
     }
 
     public static Builder builder(TraceId traceId, String operationName) {
-        return new Builder(traceId, operationName);
+        return new Builder(traceId, SpanId.generate(), operationName);
+    }
+
+    public static Builder builderWithSpanId(TraceId traceId, SpanId spanId, String operationName) {
+        return new Builder(traceId, spanId, operationName);
     }
 
     public SpanId spanId() { return spanId; }
@@ -58,7 +62,7 @@ public final class Span {
     }
 
     public static final class Builder {
-        private final SpanId spanId = SpanId.generate();
+        private final SpanId spanId;
         private final TraceId traceId;
         private SpanId parentSpanId;
         private final String operationName;
@@ -67,8 +71,9 @@ public final class Span {
         private SpanStatus status = SpanStatus.UNSET;
         private final Map<String, String> attributes = new HashMap<>();
 
-        private Builder(TraceId traceId, String operationName) {
+        private Builder(TraceId traceId, SpanId spanId, String operationName) {
             this.traceId = Objects.requireNonNull(traceId, "traceId must not be null");
+            this.spanId = Objects.requireNonNull(spanId, "spanId must not be null");
             this.operationName = Objects.requireNonNull(operationName, "operationName must not be null");
         }
 

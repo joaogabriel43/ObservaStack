@@ -80,13 +80,37 @@ spans (span_id PK, trace_id FK, parent_span_id, operation_name,
 
 ---
 
-### ADR-3: JFR via HTTP Push Assíncrono
+### ADR-3: JFR via HTTP Push Assíncrono (e Traces)
 
-**Decisão:** O SDK coletará dados JFR (Java Flight Recorder) e os enviará ao server via HTTP push assíncrono, com buffer circular gerenciado pelo Resilience4j.
+**Decisão:** O SDK coletará dados e traces e os enviará ao server via HTTP push assíncrono, com buffer circular gerenciado pelo Resilience4j e `ArrayBlockingQueue`.
 
-**Status:** Estrutura preparada no Sprint 1. **Implementação a partir do Sprint 2.**
+**Status:** Implementado no Sprint 2.
 
-**Consequências:** O SDK core não deve bloquear a thread da aplicação durante o envio de dados JFR.
+**Consequências:** 
+- O SDK core não bloqueia a thread da aplicação durante o envio de dados.
+- Caso o servidor (`POST /api/v1/traces`) esteja indisponível, o Resilience4j fará até 3 tentativas com backoff exponencial. Se falhar, os dados voltam para o buffer para a próxima janela (30s).
+- Se o buffer atingir o `observastack.buffer.max-size` (padrão 1000), os spans mais antigos são descartados para evitar OOM.
+
+**Contrato JSON (POST /api/v1/traces):**
+```json
+{
+  "serviceName": "observastack-demo-app",
+  "spans": [
+    {
+      "traceId": "1a2b3c...",
+      "spanId": "4d5e6f...",
+      "parentSpanId": "null_or_id",
+      "operationName": "GET /api/products",
+      "startedAt": "2026-05-20T10:00:00Z",
+      "endedAt": "2026-05-20T10:00:00.050Z",
+      "status": "OK",
+      "attributes": {
+        "http.status_code": "200"
+      }
+    }
+  ]
+}
+```
 
 ---
 

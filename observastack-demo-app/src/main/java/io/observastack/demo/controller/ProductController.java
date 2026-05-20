@@ -27,13 +27,27 @@ public class ProductController {
         Map.of("id", 5, "name", "Distributed Systems Design", "price", new BigDecimal("89.90"), "category", "books")
     );
 
+    private final org.springframework.web.client.RestTemplate restTemplate;
+
+    public ProductController(org.springframework.web.client.RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
     /**
-     * Lista todos os produtos disponíveis.
+     * Lista todos os produtos disponíveis e faz uma chamada a si mesmo para demonstrar outbound tracing.
      *
      * @return HTTP 200 com lista de produtos
      */
     @GetMapping
-    public ResponseEntity<Map<String, Object>> listProducts() {
+    public ResponseEntity<Map<String, Object>> listProducts(jakarta.servlet.http.HttpServletRequest request) {
+        // Simula uma chamada externa (neste caso, a si mesmo no Actuator) para disparar o ClientHttpRequestInterceptor
+        try {
+            String baseUrl = String.format("%s://%s:%d", request.getScheme(), request.getServerName(), request.getServerPort());
+            restTemplate.getForObject(baseUrl + "/actuator/health", String.class);
+        } catch (Exception e) {
+            // Ignora se der erro (ex: rodando em porta diferente no teste)
+        }
+
         return ResponseEntity.ok(Map.of(
             "data", PRODUCTS,
             "total", PRODUCTS.size(),
