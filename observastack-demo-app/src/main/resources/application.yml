@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: observastack-demo-app
+
+# ObservaStack SDK — autoconfigurado via observastack-sdk-spring-boot-starter
+observastack:
+  enabled: true
+  server-url: http://localhost:8080
+  service-name: observastack-demo-app
+  sampling-rate: 1.0  # 100% dos traces coletados em desenvolvimento
+
+# Spring Boot Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: ObservaStack Demo App
+    version: 0.1.0-SNAPSHOT
+    description: Aplicação de demonstração do ObservaStack SDK
+
+server:
+  port: 8081  # Porta diferente do server (8080) para rodar ambos localmente
+
+logging:
+  level:
+    io.observastack: DEBUG
